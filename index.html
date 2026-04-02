@@ -1,1038 +1,333 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
   <title>Collection Hub</title>
+  <meta name="theme-color" content="#13172A"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="CH Store"/>
+  <meta name="description" content="Премиальный маркетплейс коллекционных товаров"/>
 
-  <!-- PWA -->
-  <meta name="theme-color" content="#13172A" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="CH Store" />
-  <meta name="description" content="Премиальный маркетплейс лимитированных коллекционных товаров" />
-  <link rel="manifest" id="pwa-manifest" />
-
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- React 18 -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-
-  <!-- Babel (JSX in browser) -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide-react@0.383.0/dist/umd/lucide-react.js"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.23.9/babel.min.js"></script>
 
   <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; padding: 0; background: #13172A; }
-    .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    @keyframes slideDown {
-      from { opacity: 0; transform: translate(-50%, -14px); }
-      to   { opacity: 1; transform: translate(-50%, 0); }
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.4; }
-    }
-    .animate-pulse { animation: pulse 1.5s ease-in-out infinite; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{background:#13172A;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+    #root{min-height:100vh}
+    input[type=range]{-webkit-appearance:none;height:4px;border-radius:2px;background:rgba(255,255,255,.15);outline:none}
+    input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#f48a59;cursor:pointer}
+    input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+    .ns{scrollbar-width:none;-ms-overflow-style:none}
+    .ns::-webkit-scrollbar{display:none}
+    @keyframes sDown{from{opacity:0;transform:translate(-50%,-14px)}to{opacity:1;transform:translate(-50%,0)}}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+    .pulse{animation:pulse 1.4s ease-in-out infinite}
+    @keyframes fIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .fi{animation:fIn .22s ease both}
+    button{cursor:pointer;font-family:inherit;border:none;outline:none}
+    input,select{font-family:inherit}
+    img{display:block}
   </style>
 </head>
 <body>
-  <div id="root"></div>
+<div id="root"></div>
 
-  <script type="text/babel">
-    const { useState, useEffect } = React;
-    const {
-      Search, Settings, User, Plus, ShoppingCart, Info, Home, ArrowLeft,
-      Trash2, LayoutDashboard, CheckCircle2, Flame, Tag, Gavel, SlidersHorizontal,
-      TrendingUp, Award, Zap, Filter
-    } = LucideReact;
+<script type="text/babel" data-presets="react">
+const { useState, useEffect } = React;
 
-    // ─── PWA MANIFEST (inline via Blob) ──────────────────────────────────────
-    const manifestData = {
-      name: "Collection Hub",
-      short_name: "CH Store",
-      description: "Премиальный маркетплейс коллекционных товаров",
-      start_url: ".",
-      display: "standalone",
-      background_color: "#13172A",
-      theme_color: "#13172A",
-      icons: [
-        { src: "https://via.placeholder.com/192x192/13172A/f48a59?text=CH", sizes: "192x192", type: "image/png" },
-        { src: "https://via.placeholder.com/512x512/13172A/f48a59?text=CH", sizes: "512x512", type: "image/png" }
-      ]
-    };
-    const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
-    document.getElementById('pwa-manifest').href = URL.createObjectURL(manifestBlob);
+/* SVG ICONS */
+const Ic = {
+  Settings: () => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+    </svg>
+  ),
+  User: () => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+    </svg>
+  ),
+  Plus: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+  ),
+  Cart: () => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+    </svg>
+  ),
+  Home: () => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+      <polyline points="9 22 9 12 15 12 15 22"/>
+    </svg>
+  ),
+  Info: () => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+    </svg>
+  ),
+  Back: () => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+  ),
+  Trash: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="3 6 5 6 21 6"/>
+      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+      <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+    </svg>
+  ),
+  Gavel: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 13L3 22l-1-1 9-11"/>
+      <path d="M2 8l4-4 10 10-4 4z"/>
+      <path d="M14 6l4-4 4 4-4 4z"/>
+    </svg>
+  ),
+  Tag: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+      <line x1="7" y1="7" x2="7.01" y2="7"/>
+    </svg>
+  ),
+  Trend: () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+      <polyline points="17 6 23 6 23 12"/>
+    </svg>
+  ),
+  Check: () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  ),
+  Zap: () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+    </svg>
+  ),
+  Award: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="8" r="6"/>
+      <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
+    </svg>
+  ),
+  AdminIcon: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+      <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+    </svg>
+  ),
+  FilterIcon: () => (
+    <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+    </svg>
+  ),
+};
 
-    // ─── SERVICE WORKER (inline via Blob) ────────────────────────────────────
-    const swCode = `
-      const CACHE = 'ch-store-v1';
-      const ASSETS = [location.href];
-      self.addEventListener('install', e => {
-        e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
-        self.skipWaiting();
-      });
-      self.addEventListener('activate', e => {
-        e.waitUntil(caches.keys().then(keys =>
-          Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-        ));
-        self.clients.claim();
-      });
-      self.addEventListener('fetch', e => {
-        e.respondWith(
-          caches.match(e.request).then(cached => cached || fetch(e.request))
-        );
-      });
-    `;
-    if ('serviceWorker' in navigator) {
-      const swBlob = new Blob([swCode], { type: 'application/javascript' });
-      navigator.serviceWorker.register(URL.createObjectURL(swBlob));
-    }
+/* DATA */
+const PRODS0 = [
+  {id:1,title:'Лимитная футболка Амановой Камилы',price:3500,image:'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&q=80',type:'small',category:'clothes',description:'Эксклюзивная футболка с уникальным принтом. 100% хлопок.',sales:142,isNew:true},
+  {id:2,title:'Baketan 2.0 Дизайнерский комп',price:12900,image:'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&q=80',type:'small',category:'tech',description:'Ретро-дизайн с современной начинкой.',sales:89,isNew:false},
+  {id:3,title:'NIKE AIR JORDAN 1 AJKO "Chicago" lim.edition',price:45000,image:'https://images.unsplash.com/photo-1515955656352-a1fa3ffcd111?w=1200&q=80',type:'featured',category:'shoes',tag:'COMING BACK',description:'Легендарные кроссовки в оригинальной расцветке Chicago.',sales:310,isNew:false},
+  {id:4,title:'Винтажное худи "Dark Knight"',price:6500,salePrice:4200,image:'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&q=80',type:'small',category:'clothes',description:'Плотное худи с эффектом потертости.',sales:205,isNew:false,onSale:true},
+  {id:5,title:'Розовый вязаный свитер "Skull"',price:5200,salePrice:3100,image:'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=80',type:'small',category:'clothes',description:'Мягкий акриловый свитер с контрастным рисунком.',sales:178,isNew:false,onSale:true},
+  {id:6,title:'Bape Shark Hoodie Grey/Camo',price:28000,image:'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&q=80',type:'small',category:'clothes',description:'Оригинальное худи A Bathing Ape.',sales:411,isNew:false},
+  {id:7,title:'Casio G-Shock DW-6900 Gold',price:9800,salePrice:7200,image:'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80',type:'small',category:'accessories',description:'Культовые часы в золотом исполнении.',sales:267,isNew:false,onSale:true},
+  {id:8,title:'Supreme Box Logo Tee SS24',price:15000,image:'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&q=80',type:'small',category:'clothes',description:'Сезонная коллекция Supreme.',sales:523,isNew:true},
+];
+const AUCS0 = [
+  {id:101,title:'Off-White x Nike "The Ten" Blazer',image:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80',startPrice:35000,currentBid:87500,minStep:1000,endsAt:Date.now()+1000*60*47+1000*3600*2,bids:14,category:'shoes',description:'Одна из самых знаковых коллабораций.'},
+  {id:102,title:"Vintage Levi's 501 1980s Original",image:'https://images.unsplash.com/photo-1542272604-787c3835535d?w=600&q=80',startPrice:8000,currentBid:19400,minStep:500,endsAt:Date.now()+1000*60*23+1000*3600*5,bids:8,category:'clothes',description:'Оригинальные американские джинсы из 80-х.'},
+  {id:103,title:'KAWS Companion BFF Pink Edition',image:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',startPrice:25000,currentBid:62000,minStep:2000,endsAt:Date.now()+1000*60*12,bids:22,category:'collectibles',description:'Лимитированная фигурка KAWS.'},
+];
+const CATS = [
+  {id:'all',label:'Все'},{id:'shoes',label:'Обувь'},{id:'clothes',label:'Одежда'},
+  {id:'accessories',label:'Аксессуары'},{id:'tech',label:'Техника'},{id:'collectibles',label:'Фигурки'},
+];
 
-    // ─── MOCK DATA ────────────────────────────────────────────────────────────
-    const initialProducts = [
-      {
-        id: 1, title: 'Лимитная футболка Амановой Камилы', price: 3500,
-        image: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&q=80',
-        type: 'small', category: 'clothes',
-        description: 'Эксклюзивная футболка с уникальным принтом. 100% хлопок.',
-        sales: 142, isNew: true,
-      },
-      {
-        id: 2, title: 'Baketan 2.0 Дизайнерский комп', price: 12900,
-        image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&q=80',
-        type: 'small', category: 'tech',
-        description: 'Ретро-дизайн с современной начинкой. Идеально для коллекционеров.',
-        sales: 89, isNew: false,
-      },
-      {
-        id: 3, title: 'NIKE AIR JORDAN 1 AJKO "Chicago" lim.edition', price: 45000,
-        image: 'https://images.unsplash.com/photo-1515955656352-a1fa3ffcd111?w=1200&q=80',
-        type: 'featured', category: 'shoes', tag: 'COMING BACK',
-        description: 'Легендарные кроссовки в оригинальной расцветке Chicago. Ограниченный тираж.',
-        sales: 310, isNew: false,
-      },
-      {
-        id: 4, title: 'Винтажное худи "Dark Knight"', price: 6500, salePrice: 4200,
-        image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&q=80',
-        type: 'small', category: 'clothes',
-        description: 'Плотное худи с эффектом потертости (wash).',
-        sales: 205, isNew: false, onSale: true,
-      },
-      {
-        id: 5, title: 'Розовый вязаный свитер "Skull"', price: 5200, salePrice: 3100,
-        image: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=80',
-        type: 'small', category: 'clothes',
-        description: 'Мягкий акриловый свитер с контрастным рисунком.',
-        sales: 178, isNew: false, onSale: true,
-      },
-      {
-        id: 6, title: 'Bape Shark Hoodie Grey/Camo', price: 28000,
-        image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&q=80',
-        type: 'small', category: 'clothes',
-        description: 'Оригинальное худи A Bathing Ape с культовым принтом акулы.',
-        sales: 411, isNew: false,
-      },
-      {
-        id: 7, title: 'Casio G-Shock DW-6900 Gold', price: 9800, salePrice: 7200,
-        image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80',
-        type: 'small', category: 'accessories',
-        description: 'Культовые часы в золотом исполнении. Ударопрочные.',
-        sales: 267, isNew: false, onSale: true,
-      },
-      {
-        id: 8, title: 'Supreme Box Logo Tee SS24', price: 15000,
-        image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&q=80',
-        type: 'small', category: 'clothes',
-        description: 'Сезонная коллекция Supreme с оригинальным боксовым логотипом.',
-        sales: 523, isNew: true,
-      },
-    ];
+const fmt = n => Number(n).toLocaleString('ru-RU');
 
-    const initialAuctions = [
-      {
-        id: 101, title: 'Off-White x Nike "The Ten" Blazer',
-        image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80',
-        startPrice: 35000, currentBid: 87500, minStep: 1000,
-        endsAt: Date.now() + 1000 * 60 * 47 + 1000 * 3600 * 2,
-        bids: 14, category: 'shoes',
-        description: 'Одна из самых знаковых коллабораций в истории кроссовок.',
-      },
-      {
-        id: 102, title: "Vintage Levi's 501 1980s Original",
-        image: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=600&q=80',
-        startPrice: 8000, currentBid: 19400, minStep: 500,
-        endsAt: Date.now() + 1000 * 60 * 23 + 1000 * 3600 * 5,
-        bids: 8, category: 'clothes',
-        description: 'Оригинальные американские джинсы из 80-х. Wear-patch сохранён.',
-      },
-      {
-        id: 103, title: 'KAWS Companion BFF Pink Edition',
-        image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
-        startPrice: 25000, currentBid: 62000, minStep: 2000,
-        endsAt: Date.now() + 1000 * 60 * 12,
-        bids: 22, category: 'collectibles',
-        description: 'Лимитированная фигурка KAWS в розовом цвете. В оригинальной упаковке.',
-      },
-    ];
+function useCD(ts) {
+  const [r, setR] = useState(Math.max(0, ts - Date.now()));
+  useEffect(() => {
+    const t = setInterval(() => setR(Math.max(0, ts - Date.now())), 1000);
+    return () => clearInterval(t);
+  }, [ts]);
+  return { h: Math.floor(r/3600000), m: Math.floor((r%3600000)/60000), s: Math.floor((r%60000)/1000), done: r===0 };
+}
 
-    const CATEGORIES = [
-      { id: 'all',         label: 'Все' },
-      { id: 'shoes',       label: 'Обувь' },
-      { id: 'clothes',     label: 'Одежда' },
-      { id: 'accessories', label: 'Аксессуары' },
-      { id: 'tech',        label: 'Техника' },
-      { id: 'collectibles',label: 'Фигурки' },
-    ];
+function CDot({ ts, compact }) {
+  const { h, m, s, done } = useCD(ts);
+  if (done) return <span style={{color:'#f87171',fontSize:12,fontWeight:700}}>ЗАВЕРШЁН</span>;
+  const u = h===0&&m<10;
+  const txt = compact
+    ? `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+    : `${h}ч ${String(m).padStart(2,'0')}м ${String(s).padStart(2,'0')}с`;
+  return <span className={u?'pulse':''} style={{fontFamily:'monospace',fontSize:12,fontWeight:700,color:u?'#f87171':'#fdba74'}}>{txt}</span>;
+}
 
-    // ─── UTILS ────────────────────────────────────────────────────────────────
-    const fmt = (n) => Number(n).toLocaleString('ru-RU');
+/* SHARED STYLES */
+const dk = {background:'#1a2035',borderRadius:16,border:'1px solid rgba(255,255,255,.07)'};
+const inp0 = {background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.12)',borderRadius:12,padding:'11px 14px',color:'white',fontSize:14,outline:'none',width:'100%',fontFamily:'inherit'};
+const inpLt = {background:'#f9fafb',border:'1px solid #e5e7eb',borderRadius:12,padding:'11px 14px',fontSize:14,outline:'none',width:'100%',fontFamily:'inherit',color:'#111827'};
 
-    function useCountdown(targetTs) {
-      const [remaining, setRemaining] = useState(Math.max(0, targetTs - Date.now()));
-      useEffect(() => {
-        const t = setInterval(() => setRemaining(Math.max(0, targetTs - Date.now())), 1000);
-        return () => clearInterval(t);
-      }, [targetTs]);
-      const h = Math.floor(remaining / 3600000);
-      const m = Math.floor((remaining % 3600000) / 60000);
-      const s = Math.floor((remaining % 60000) / 1000);
-      return { h, m, s, done: remaining === 0 };
-    }
+function App() {
+  const [view,  setView]  = useState('home');
+  const [aF,    setAF]    = useState(null);
+  const [prods, setProds] = useState(PRODS0);
+  const [aucs,  setAucs]  = useState(AUCS0);
+  const [selP,  setSelP]  = useState(null);
+  const [selA,  setSelA]  = useState(null);
+  const [cart,  setCart]  = useState([]);
+  const [q,     setQ]     = useState('');
+  const [toast, setToast] = useState({msg:'',err:false});
+  const [fp,    setFP]    = useState(false);
+  const [fCat,  setFCat]  = useState('all');
+  const [fMax,  setFMax]  = useState(100000);
+  const [fSale, setFSale] = useState(false);
+  const [sort,  setSort]  = useState('default');
+  const [bids,  setBids]  = useState({});
 
-    const CountdownBadge = ({ endsAt, compact }) => {
-      const { h, m, s, done } = useCountdown(endsAt);
-      if (done) return <span style={{ color: '#f87171', fontSize: 12, fontWeight: 700 }}>ЗАВЕРШЁН</span>;
-      const urgent = h === 0 && m < 10;
-      const txt = compact
-        ? `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
-        : `${h}ч ${String(m).padStart(2,'0')}м ${String(s).padStart(2,'0')}с`;
-      return (
-        <span className={urgent ? 'animate-pulse' : ''}
-          style={{ fontFamily: 'monospace', fontSize: 12, fontWeight: 700, color: urgent ? '#f87171' : '#fdba74' }}>
-          {txt}
-        </span>
-      );
-    };
+  const showT = (msg, err=false) => { setToast({msg,err}); setTimeout(()=>setToast({msg:'',err:false}),2200); };
 
-    // ─── APP ──────────────────────────────────────────────────────────────────
-    function App() {
-      const [currentView, setCurrentView]       = useState('home');
-      const [activeFilter, setActiveFilter]     = useState(null);
-      const [products, setProducts]             = useState(initialProducts);
-      const [auctions, setAuctions]             = useState(initialAuctions);
-      const [selectedProduct, setSelectedProduct] = useState(null);
-      const [selectedAuction, setSelectedAuction] = useState(null);
-      const [cart, setCart]                     = useState([]);
-      const [searchQuery, setSearchQuery]       = useState('');
-      const [toast, setToast]                   = useState({ msg: '', type: 'success' });
-      const [filterPanel, setFilterPanel]       = useState(false);
-      const [filterCategory, setFilterCategory] = useState('all');
-      const [filterPriceMax, setFilterPriceMax] = useState(100000);
-      const [filterOnSale, setFilterOnSale]     = useState(false);
-      const [sortBy, setSortBy]                 = useState('default');
-      const [bidInput, setBidInput]             = useState({});
+  const addCart = (p,e) => {
+    if(e) e.stopPropagation();
+    setCart(prev => {
+      const ex = prev.find(i=>i.id===p.id);
+      return ex ? prev.map(i=>i.id===p.id?{...i,qty:i.qty+1}:i) : [...prev,{...p,qty:1}];
+    });
+    showT('Добавлено в корзину ✓');
+  };
+  const rmItem = id => setCart(p=>p.filter(i=>i.id!==id));
+  const updQ   = (id,d) => setCart(p=>p.map(i=>i.id===id?(i.qty+d>0?{...i,qty:i.qty+d}:i):i));
+  const cTotal = cart.reduce((s,i)=>s+(i.salePrice||i.price)*i.qty,0);
+  const cCount = cart.reduce((s,i)=>s+i.qty,0);
 
-      const showToast = (msg, type = 'success') => {
-        setToast({ msg, type });
-        setTimeout(() => setToast({ msg: '', type: 'success' }), 2200);
-      };
+  const go     = v => { setView(v); window.scrollTo(0,0); };
+  const openP  = p => { setSelP(p); go('product'); };
+  const openA  = a => { setSelA(a); go('auc-detail'); };
 
-      // CART
-      const addToCart = (product, e) => {
-        if (e) e.stopPropagation();
-        setCart(prev => {
-          const ex = prev.find(i => i.id === product.id);
-          if (ex) return prev.map(i => i.id === product.id ? { ...i, qty: i.qty + 1 } : i);
-          return [...prev, { ...product, qty: 1 }];
-        });
-        showToast('Добавлено в корзину ✓');
-      };
-      const removeFromCart = (id) => setCart(prev => prev.filter(i => i.id !== id));
-      const updateQty = (id, d) => setCart(prev =>
-        prev.map(i => i.id === id ? (i.qty + d > 0 ? { ...i, qty: i.qty + d } : i) : i)
-      );
-      const cartTotal = cart.reduce((s, i) => s + (i.salePrice || i.price) * i.qty, 0);
-      const cartCount = cart.reduce((s, i) => s + i.qty, 0);
+  const togF = f => {
+    if(f==='filter'){ setFP(p=>!p); return; }
+    setAF(p=>p===f?null:f); setFP(false);
+  };
 
-      // NAV
-      const navTo = (view) => { setCurrentView(view); window.scrollTo(0, 0); };
-      const openProduct = (p) => { setSelectedProduct(p); navTo('product'); };
-      const openAuction = (a) => { setSelectedAuction(a); navTo('auction-detail'); };
+  const flist = (() => {
+    let L = [...prods];
+    if(q) L = L.filter(p=>p.title.toLowerCase().includes(q.toLowerCase()));
+    if(aF==='top')  L = [...L].sort((a,b)=>b.sales-a.sales).slice(0,6);
+    if(aF==='sale') L = L.filter(p=>p.onSale);
+    if(fCat!=='all') L = L.filter(p=>p.category===fCat);
+    if(fSale) L = L.filter(p=>p.onSale);
+    L = L.filter(p=>(p.salePrice||p.price)<=fMax);
+    if(sort==='price_asc')  L = [...L].sort((a,b)=>(a.salePrice||a.price)-(b.salePrice||b.price));
+    if(sort==='price_desc') L = [...L].sort((a,b)=>(b.salePrice||b.price)-(a.salePrice||a.price));
+    if(sort==='sales')      L = [...L].sort((a,b)=>b.sales-a.sales);
+    return L;
+  })();
 
-      // FILTERS
-      const toggleFilter = (f) => {
-        if (f === 'filter') { setFilterPanel(prev => !prev); return; }
-        setActiveFilter(prev => prev === f ? null : f);
-        setFilterPanel(false);
-      };
+  const doBid = id => {
+    const amt = parseInt(bids[id]||0);
+    setAucs(prev=>prev.map(a=>{
+      if(a.id!==id) return a;
+      if(amt<=a.currentBid){ showT('Ставка должна быть выше текущей',true); return a; }
+      if(amt<a.currentBid+a.minStep){ showT(`Мин. шаг: ${fmt(a.minStep)} ₽`,true); return a; }
+      showT(`Ставка ${fmt(amt)} ₽ принята! 🔥`);
+      setBids(p=>({...p,[id]:''}));
+      return {...a,currentBid:amt,bids:a.bids+1};
+    }));
+  };
 
-      const getFilteredProducts = () => {
-        let list = [...products];
-        if (searchQuery) list = list.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase()));
-        if (activeFilter === 'top')  list = list.sort((a, b) => b.sales - a.sales).slice(0, 6);
-        if (activeFilter === 'sale') list = list.filter(p => p.onSale);
-        if (filterCategory !== 'all') list = list.filter(p => p.category === filterCategory);
-        if (filterOnSale) list = list.filter(p => p.onSale);
-        list = list.filter(p => (p.salePrice || p.price) <= filterPriceMax);
-        if (sortBy === 'price_asc')  list = list.sort((a, b) => (a.salePrice||a.price) - (b.salePrice||b.price));
-        if (sortBy === 'price_desc') list = list.sort((a, b) => (b.salePrice||b.price) - (a.salePrice||a.price));
-        if (sortBy === 'sales')      list = list.sort((a, b) => b.sales - a.sales);
-        return list;
-      };
+  /* ---- PRODUCT CARD ---- */
+  function PCard({ p, rank, showSale }) {
+    const isFeat = p.type==='featured';
+    return (
+      <div className="fi"
+        onClick={()=>openP(p)}
+        style={{position:'relative',overflow:'hidden',cursor:'pointer',borderRadius:28,background:'white',
+          aspectRatio:isFeat?'4/3':'1/1',gridColumn:isFeat?'span 2':'span 1',
+          boxShadow:'0 6px 20px rgba(0,0,0,.35)',transition:'transform .15s'}}
+        onTouchStart={e=>e.currentTarget.style.transform='scale(.96)'}
+        onTouchEnd={e=>e.currentTarget.style.transform='scale(1)'}
+      >
+        <img src={p.image} alt={p.title} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
+        <div style={{position:'absolute',inset:0,background:'linear-gradient(to top,rgba(0,0,0,.82),rgba(0,0,0,.12) 55%,transparent)'}}/>
 
-      // AUCTION BID
-      const placeBid = (auctionId) => {
-        const amt = parseInt(bidInput[auctionId] || 0);
-        setAuctions(prev => prev.map(a => {
-          if (a.id !== auctionId) return a;
-          if (amt <= a.currentBid) { showToast(`Ставка должна быть выше ${fmt(a.currentBid)} ₽`, 'error'); return a; }
-          if (amt < a.currentBid + a.minStep) { showToast(`Минимальный шаг: ${fmt(a.minStep)} ₽`, 'error'); return a; }
-          showToast(`Ставка ${fmt(amt)} ₽ принята! 🔥`);
-          setBidInput(prev => ({ ...prev, [auctionId]: '' }));
-          return { ...a, currentBid: amt, bids: a.bids + 1 };
-        }));
-      };
-
-      // ── PRODUCT CARD ────────────────────────────────────────────────────────
-      const ProductCard = ({ product, onClick, onAdd, rank, showSaleBadge }) => (
-        <div
-          onClick={onClick}
-          className={`relative overflow-hidden cursor-pointer transition-transform shadow-xl ${product.type === 'featured' ? 'col-span-2' : 'col-span-1'}`}
-          style={{ borderRadius: '2rem', background: 'white', aspectRatio: product.type === 'featured' ? '4/3' : '1/1' }}
-        >
-          <img src={product.image} alt={product.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to top,rgba(0,0,0,0.82) 0%,rgba(0,0,0,0.18) 50%,transparent 100%)' }} />
-
-          {product.tag && (
-            <div className="absolute top-0 left-1/2 text-white font-black uppercase z-10 whitespace-nowrap"
-              style={{ transform:'translateX(-50%)', background:'#f48a59', borderRadius:'0 0 0.9rem 0.9rem', padding:'6px 20px', fontSize:13, letterSpacing:'0.12em' }}>
-              {product.tag}
-            </div>
-          )}
-
-          {rank && (
-            <div className="absolute top-3 left-3 w-8 h-8 rounded-full flex items-center justify-center font-black text-sm z-10 shadow-lg"
-              style={{ background: rank===1?'#facc15':rank===2?'#d1d5db':rank===3?'#b45309':'rgba(0,0,0,0.5)', color: rank<=2?'black':'white' }}>
-              {rank}
-            </div>
-          )}
-
-          {product.isNew && !rank && (
-            <div className="absolute top-3 left-3 bg-blue-500 text-white font-black uppercase z-10"
-              style={{ fontSize:10, padding:'2px 8px', borderRadius:999 }}>NEW</div>
-          )}
-
-          {showSaleBadge && product.onSale && !rank && !product.isNew && (
-            <div className="absolute top-3 left-3 text-white font-black uppercase z-10"
-              style={{ background:'#22c55e', fontSize:10, padding:'2px 8px', borderRadius:999 }}>
-              -{Math.round((1 - product.salePrice / product.price) * 100)}%
-            </div>
-          )}
-
-          <button onClick={onAdd} className="absolute top-3 right-3 text-white rounded-full z-10 transition-transform"
-            style={{ background:'#f48a59', padding:6 }}
-            onMouseDown={e => e.currentTarget.style.transform='scale(0.88)'}
-            onMouseUp={e => e.currentTarget.style.transform='scale(1)'}
-            onTouchStart={e => e.currentTarget.style.transform='scale(0.88)'}
-            onTouchEnd={e => e.currentTarget.style.transform='scale(1)'}>
-            <Plus size={20} strokeWidth={3} />
-          </button>
-
-          <div className="absolute bottom-4 left-4 right-4 z-10">
-            <h3 style={{ color:'white', fontWeight:600, lineHeight:1.3, fontSize: product.type==='featured'?18:13 }}>
-              {product.title}
-            </h3>
-            {product.type === 'featured' && !product.onSale && (
-              <p style={{ color:'rgba(255,255,255,0.8)', fontWeight:600, marginTop:4 }}>{fmt(product.price)} ₽</p>
-            )}
-            {product.type === 'featured' && product.onSale && (
-              <div style={{ display:'flex', gap:6, marginTop:4, alignItems:'baseline' }}>
-                <span style={{ color:'#86efac', fontWeight:700 }}>{fmt(product.salePrice)} ₽</span>
-                <span style={{ color:'rgba(255,255,255,0.4)', fontSize:12, textDecoration:'line-through' }}>{fmt(product.price)}</span>
-              </div>
-            )}
-            {product.type !== 'featured' && product.onSale && (
-              <div style={{ display:'flex', gap:4, marginTop:3, alignItems:'baseline' }}>
-                <span style={{ color:'#86efac', fontWeight:700, fontSize:12 }}>{fmt(product.salePrice)} ₽</span>
-                <span style={{ color:'rgba(255,255,255,0.4)', fontSize:10, textDecoration:'line-through' }}>{fmt(product.price)}</span>
-              </div>
-            )}
+        {p.tag && (
+          <div style={{position:'absolute',top:0,left:'50%',transform:'translateX(-50%)',background:'#f48a59',color:'white',fontWeight:900,fontSize:13,padding:'5px 20px',borderRadius:'0 0 14px 14px',letterSpacing:'.1em',zIndex:3,whiteSpace:'nowrap'}}>
+            {p.tag}
           </div>
-        </div>
-      );
-
-      // ── AUCTION CARD ─────────────────────────────────────────────────────────
-      const AuctionCard = ({ auction }) => {
-        const { h, m, s, done } = useCountdown(auction.endsAt);
-        const urgent = h === 0 && m < 10;
-        return (
-          <div style={{ background:'#1a2035', borderRadius:'1rem', overflow:'hidden', border: urgent?'1px solid rgba(248,113,113,0.5)':'1px solid rgba(168,85,247,0.3)', boxShadow:'0 10px 30px rgba(0,0,0,0.3)' }}>
-            <div style={{ position:'relative', height:192, cursor:'pointer' }} onClick={() => openAuction(auction)}>
-              <img src={auction.image} alt={auction.title} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-              <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top,rgba(0,0,0,0.8),transparent)' }} />
-              <div style={{ position:'absolute', top:12, left:12, background:'rgba(147,51,234,0.9)', borderRadius:999, padding:'4px 10px', display:'flex', alignItems:'center', gap:4 }}>
-                <Gavel size={11} color="white" />
-                <span style={{ color:'white', fontSize:11, fontWeight:700 }}>АУКЦИОН</span>
-              </div>
-              <div style={{ position:'absolute', top:12, right:12, background:'rgba(0,0,0,0.6)', borderRadius:999, padding:'4px 10px' }}>
-                <CountdownBadge endsAt={auction.endsAt} compact />
-              </div>
-              <div style={{ position:'absolute', bottom:12, left:12, right:12 }}>
-                <p style={{ color:'white', fontWeight:700, fontSize:14, lineHeight:1.3 }}>{auction.title}</p>
-              </div>
-            </div>
-            <div style={{ padding:16 }}>
-              <div style={{ display:'flex', justifyContent:'space-between', marginBottom:12 }}>
-                <div>
-                  <p style={{ color:'#9ca3af', fontSize:12 }}>Текущая ставка</p>
-                  <p style={{ color:'white', fontWeight:900, fontSize:20 }}>{fmt(auction.currentBid)} ₽</p>
-                </div>
-                <div style={{ textAlign:'right' }}>
-                  <p style={{ color:'#9ca3af', fontSize:12 }}>Ставок</p>
-                  <p style={{ color:'#c084fc', fontWeight:700, fontSize:20 }}>{auction.bids}</p>
-                </div>
-              </div>
-              <div style={{ display:'flex', gap:8 }}>
-                <input
-                  type="number"
-                  placeholder={`от ${fmt(auction.currentBid + auction.minStep)} ₽`}
-                  value={bidInput[auction.id] || ''}
-                  onChange={e => setBidInput(prev => ({ ...prev, [auction.id]: e.target.value }))}
-                  style={{ flex:1, background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'0.75rem', padding:'8px 12px', fontSize:14, color:'white', outline:'none' }}
-                />
-                <button
-                  onClick={() => placeBid(auction.id)}
-                  style={{ background:'#9333ea', color:'white', borderRadius:'0.75rem', padding:'8px 16px', fontWeight:700, fontSize:14, border:'none', cursor:'pointer' }}>
-                  Ставка
-                </button>
-              </div>
-              <p style={{ color:'#4b5563', fontSize:10, marginTop:6 }}>Минимальный шаг: {fmt(auction.minStep)} ₽</p>
-            </div>
+        )}
+        {rank && (
+          <div style={{position:'absolute',top:12,left:12,width:30,height:30,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:900,fontSize:13,zIndex:3,
+            background:rank===1?'#facc15':rank===2?'#d1d5db':rank===3?'#b45309':'rgba(0,0,0,.55)',
+            color:rank<=2?'#111':'white'}}>
+            {rank}
           </div>
-        );
-      };
-
-      // ── HOME VIEW ────────────────────────────────────────────────────────────
-      const HomeView = () => {
-        const filtered = getFilteredProducts();
-        return (
-          <div style={{ background:'#13172A', paddingBottom:112 }}>
-            {/* Header */}
-            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'20px 20px 4px', color:'#d1d5db' }}>
-              <button onClick={() => navTo('admin')} style={{ background:'none', border:'none', cursor:'pointer', color:'#d1d5db', padding:4 }}>
-                <Settings size={24} />
-              </button>
-              <span style={{ fontSize:13, fontWeight:500, letterSpacing:'0.12em' }}>*чавапчики*</span>
-              <User size={24} />
-            </div>
-
-            {/* Search pill — centered */}
-            <div style={{ display:'flex', justifyContent:'center', padding:'12px 24px 20px' }}>
-              <div style={{ display:'flex', alignItems:'center', border:'1px solid #6b7280', borderRadius:999, padding:'10px 20px', width:'100%', maxWidth:260 }}>
-                <span style={{ color:'#9ca3af', fontSize:14, marginRight:8, userSelect:'none' }}>search...</span>
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  style={{ background:'transparent', border:'none', outline:'none', color:'white', fontSize:14, width:'100%' }}
-                />
-              </div>
-            </div>
-
-            {/* CH Logo */}
-            <div style={{ display:'flex', flexDirection:'column', alignItems:'center', marginBottom:20 }}>
-              <div style={{ display:'flex', alignItems:'flex-end', lineHeight:1, fontWeight:700, fontSize:100, letterSpacing:'-5px' }}>
-                <span style={{ color:'#f9d4cf' }}>C</span>
-                <span style={{ color:'#f48a59', marginLeft:-8 }}>H</span>
-              </div>
-              <div style={{ color:'white', fontWeight:500, letterSpacing:'0.08em', fontSize:17, marginTop:-8 }}>
-                collection <span style={{ color:'#f48a59' }}>hub</span>
-              </div>
-            </div>
-
-            {/* Filter pills */}
-            <div className="no-scrollbar" style={{ display:'flex', gap:12, justifyContent:'center', padding:'0 20px 28px', overflowX:'auto' }}>
-              {[
-                { id:'top',     label:'TOP'  },
-                { id:'auction', label:'AUC.' },
-                { id:'sale',    label:'SELL' },
-                { id:'filter',  label:'FLTR' },
-              ].map(({ id, label }) => {
-                const isActive = activeFilter === id || (id === 'filter' && filterPanel);
-                return (
-                  <button key={id} onClick={() => toggleFilter(id)}
-                    style={{
-                      whiteSpace:'nowrap', padding:'6px 24px', borderRadius:999, fontSize:14, fontWeight:600, cursor:'pointer', transition:'all 0.15s',
-                      border: `1.5px solid ${isActive ? '#f48a59' : 'rgba(255,255,255,0.7)'}`,
-                      color: isActive ? '#f48a59' : 'white',
-                      background: isActive ? 'rgba(244,138,89,0.12)' : 'transparent',
-                    }}>
-                    {label}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Filter panel */}
-            {filterPanel && (
-              <div style={{ margin:'0 16px 20px', background:'#1a2035', borderRadius:'1rem', padding:16, border:'1px solid rgba(255,255,255,0.1)' }}>
-                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
-                  <span style={{ color:'white', fontWeight:700, fontSize:14 }}>Фильтры</span>
-                  <button onClick={() => { setFilterCategory('all'); setFilterPriceMax(100000); setFilterOnSale(false); setSortBy('default'); }}
-                    style={{ color:'#f48a59', fontSize:12, fontWeight:500, background:'none', border:'none', cursor:'pointer' }}>Сбросить</button>
-                </div>
-
-                <p style={{ color:'#9ca3af', fontSize:11, textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:8 }}>Категория</p>
-                <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginBottom:16 }}>
-                  {CATEGORIES.map(c => (
-                    <button key={c.id} onClick={() => setFilterCategory(c.id)}
-                      style={{ padding:'4px 12px', borderRadius:999, fontSize:12, fontWeight:500, cursor:'pointer', border:'none',
-                        background: filterCategory === c.id ? '#f48a59' : 'rgba(255,255,255,0.05)',
-                        color: filterCategory === c.id ? 'white' : '#9ca3af',
-                        outline: filterCategory !== c.id ? '1px solid rgba(255,255,255,0.12)' : 'none' }}>
-                      {c.label}
-                    </button>
-                  ))}
-                </div>
-
-                <div style={{ display:'flex', justifyContent:'space-between', marginBottom:6 }}>
-                  <p style={{ color:'#9ca3af', fontSize:11, textTransform:'uppercase', letterSpacing:'0.1em' }}>Макс. цена</p>
-                  <span style={{ color:'#f48a59', fontSize:12, fontWeight:700 }}>{fmt(filterPriceMax)} ₽</span>
-                </div>
-                <input type="range" min={1000} max={100000} step={1000} value={filterPriceMax}
-                  onChange={e => setFilterPriceMax(parseInt(e.target.value))}
-                  style={{ width:'100%', accentColor:'#f48a59', marginBottom:16, cursor:'pointer' }} />
-
-                <p style={{ color:'#9ca3af', fontSize:11, textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:8 }}>Сортировка</p>
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom:12 }}>
-                  {[
-                    { v:'default',    l:'По умолчанию' },
-                    { v:'sales',      l:'По популярности' },
-                    { v:'price_asc',  l:'Цена ↑' },
-                    { v:'price_desc', l:'Цена ↓' },
-                  ].map(s => (
-                    <button key={s.v} onClick={() => setSortBy(s.v)}
-                      style={{ padding:'8px', borderRadius:'0.75rem', fontSize:12, fontWeight:500, cursor:'pointer', border:'none',
-                        background: sortBy === s.v ? '#f48a59' : 'rgba(255,255,255,0.05)',
-                        color: sortBy === s.v ? 'white' : '#9ca3af',
-                        outline: sortBy !== s.v ? '1px solid rgba(255,255,255,0.1)' : 'none' }}>
-                      {s.l}
-                    </button>
-                  ))}
-                </div>
-
-                <button onClick={() => setFilterOnSale(prev => !prev)}
-                  style={{ width:'100%', padding:'8px', borderRadius:'0.75rem', fontSize:12, fontWeight:700, cursor:'pointer', border:'none',
-                    background: filterOnSale ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.05)',
-                    color: filterOnSale ? '#4ade80' : '#888',
-                    outline: filterOnSale ? '1px solid rgba(34,197,94,0.5)' : '1px solid rgba(255,255,255,0.1)' }}>
-                  {filterOnSale ? '✓ Только со скидкой' : 'Только со скидкой'}
-                </button>
-              </div>
-            )}
-
-            {/* Auction section */}
-            {activeFilter === 'auction' ? (
-              <div style={{ padding:'0 16px', display:'flex', flexDirection:'column', gap:16 }}>
-                <h2 style={{ color:'white', fontWeight:700, fontSize:18, display:'flex', alignItems:'center', gap:8 }}>
-                  <Gavel size={18} color="#c084fc" /> Активные аукционы
-                </h2>
-                {auctions.map(a => <AuctionCard key={a.id} auction={a} />)}
-              </div>
-            ) : (
-              <>
-                {activeFilter === 'top' && (
-                  <div style={{ margin:'0 16px 16px', background:'rgba(244,138,89,0.12)', border:'1px solid rgba(244,138,89,0.25)', borderRadius:'1rem', padding:12, display:'flex', alignItems:'center', gap:12 }}>
-                    <TrendingUp size={18} color="#f48a59" />
-                    <div>
-                      <p style={{ color:'white', fontWeight:700, fontSize:14 }}>Топ продаж</p>
-                      <p style={{ color:'#9ca3af', fontSize:12 }}>Самые популярные товары недели</p>
-                    </div>
-                    <span style={{ marginLeft:'auto', color:'#6b7280', fontSize:12 }}>{filtered.length} шт.</span>
-                  </div>
-                )}
-                {activeFilter === 'sale' && (
-                  <div style={{ margin:'0 16px 16px', background:'rgba(34,197,94,0.1)', border:'1px solid rgba(34,197,94,0.25)', borderRadius:'1rem', padding:12, display:'flex', alignItems:'center', gap:12 }}>
-                    <Tag size={18} color="#4ade80" />
-                    <div>
-                      <p style={{ color:'white', fontWeight:700, fontSize:14 }}>Горячие скидки</p>
-                      <p style={{ color:'#9ca3af', fontSize:12 }}>Успей купить дешевле!</p>
-                    </div>
-                    <span style={{ marginLeft:'auto', color:'#6b7280', fontSize:12 }}>{filtered.length} шт.</span>
-                  </div>
-                )}
-
-                <div style={{ padding:'0 16px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
-                  {filtered.map((product, idx) => (
-                    <ProductCard
-                      key={product.id}
-                      product={product}
-                      onClick={() => openProduct(product)}
-                      onAdd={(e) => addToCart(product, e)}
-                      rank={activeFilter === 'top' ? idx + 1 : null}
-                      showSaleBadge={activeFilter === 'sale' || product.onSale}
-                    />
-                  ))}
-                  {filtered.length === 0 && (
-                    <div style={{ gridColumn:'span 2', textAlign:'center', padding:'64px 0', color:'#6b7280' }}>
-                      <Filter size={40} style={{ margin:'0 auto 12px', opacity:0.3 }} />
-                      <p style={{ fontSize:14 }}>Ничего не найдено</p>
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
+        )}
+        {p.isNew&&!rank && <div style={{position:'absolute',top:12,left:12,background:'#3b82f6',color:'white',fontSize:10,fontWeight:900,padding:'2px 8px',borderRadius:999,zIndex:3}}>NEW</div>}
+        {showSale&&p.onSale&&!rank&&!p.isNew && (
+          <div style={{position:'absolute',top:12,left:12,background:'#22c55e',color:'white',fontSize:10,fontWeight:900,padding:'2px 8px',borderRadius:999,zIndex:3}}>
+            -{Math.round((1-p.salePrice/p.price)*100)}%
           </div>
-        );
-      };
+        )}
 
-      // ── PRODUCT DETAIL ───────────────────────────────────────────────────────
-      const ProductView = () => {
-        if (!selectedProduct) return null;
-        const p = selectedProduct;
-        return (
-          <div style={{ background:'#0d1120', minHeight:'100vh', color:'white', paddingBottom:112 }}>
-            <div style={{ position:'relative', height:'55vw', maxHeight:384 }}>
-              <img src={p.image} alt={p.title} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-              <div style={{ position:'absolute', inset:0, background:'linear-gradient(to bottom,rgba(0,0,0,0.3),#0d1120)' }} />
-              <button onClick={() => navTo('home')} style={{ position:'absolute', top:20, left:16, background:'rgba(0,0,0,0.4)', border:'none', borderRadius:999, padding:8, cursor:'pointer', color:'white' }}>
-                <ArrowLeft size={22} />
-              </button>
-              {p.onSale && (
-                <div style={{ position:'absolute', top:20, right:16, background:'#22c55e', color:'white', fontSize:12, fontWeight:900, padding:'6px 12px', borderRadius:999 }}>
-                  -{Math.round((1 - p.salePrice / p.price) * 100)}% СКИДКА
-                </div>
-              )}
-            </div>
+        <button onClick={e=>{e.stopPropagation();addCart(p,e);}}
+          style={{position:'absolute',top:12,right:12,background:'#f48a59',color:'white',borderRadius:'50%',width:34,height:34,display:'flex',alignItems:'center',justifyContent:'center',zIndex:3,boxShadow:'0 2px 8px rgba(244,138,89,.5)'}}>
+          <Ic.Plus/>
+        </button>
 
-            <div style={{ padding:'0 24px' }}>
-              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:16, marginBottom:16 }}>
-                <h1 style={{ fontSize:20, fontWeight:900, lineHeight:1.3, flex:1 }}>{p.title}</h1>
-                <div style={{ textAlign:'right', flexShrink:0 }}>
-                  {p.onSale ? (
-                    <>
-                      <div style={{ color:'#4ade80', fontWeight:900, fontSize:20 }}>{fmt(p.salePrice)} ₽</div>
-                      <div style={{ color:'#6b7280', fontSize:14, textDecoration:'line-through' }}>{fmt(p.price)} ₽</div>
-                    </>
-                  ) : (
-                    <div style={{ color:'#fb923c', fontWeight:900, fontSize:20 }}>{fmt(p.price)} ₽</div>
-                  )}
-                </div>
-              </div>
-
-              <div style={{ display:'flex', gap:10, marginBottom:20, flexWrap:'wrap' }}>
-                <div style={{ background:'rgba(255,255,255,0.05)', borderRadius:'0.75rem', padding:'6px 12px', display:'flex', alignItems:'center', gap:6 }}>
-                  <TrendingUp size={13} color="#fb923c" />
-                  <span style={{ fontSize:12, color:'#d1d5db' }}>{p.sales} продаж</span>
-                </div>
-                {p.isNew && (
-                  <div style={{ background:'rgba(59,130,246,0.15)', border:'1px solid rgba(59,130,246,0.3)', borderRadius:'0.75rem', padding:'6px 12px', display:'flex', alignItems:'center', gap:6 }}>
-                    <Zap size={13} color="#93c5fd" />
-                    <span style={{ fontSize:12, color:'#93c5fd' }}>Новинка</span>
-                  </div>
-                )}
-                <div style={{ background:'rgba(255,255,255,0.05)', borderRadius:'0.75rem', padding:'6px 12px', display:'flex', alignItems:'center', gap:6 }}>
-                  <CheckCircle2 size={13} color="#4ade80" />
-                  <span style={{ fontSize:12, color:'#d1d5db' }}>Оригинал</span>
-                </div>
-              </div>
-
-              <p style={{ color:'#9ca3af', fontSize:14, lineHeight:1.7, marginBottom:32 }}>{p.description}</p>
-
-              <button onClick={() => { addToCart(p); navTo('cart'); }}
-                style={{ width:'100%', background:'#f97316', color:'white', border:'none', borderRadius:'1rem', padding:'16px', fontSize:16, fontWeight:900, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
-                <ShoppingCart size={18} /> В корзину
-              </button>
-            </div>
-          </div>
-        );
-      };
-
-      // ── AUCTION DETAIL ────────────────────────────────────────────────────────
-      const AuctionDetailView = () => {
-        if (!selectedAuction) return null;
-        const a = auctions.find(x => x.id === selectedAuction.id) || selectedAuction;
-        const { h, m, s } = useCountdown(a.endsAt);
-        return (
-          <div style={{ background:'#0d1120', minHeight:'100vh', color:'white', paddingBottom:112 }}>
-            <div style={{ position:'relative', height:'55vw', maxHeight:320 }}>
-              <img src={a.image} alt={a.title} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-              <div style={{ position:'absolute', inset:0, background:'linear-gradient(to bottom,rgba(0,0,0,0.3),#0d1120)' }} />
-              <button onClick={() => navTo('home')} style={{ position:'absolute', top:20, left:16, background:'rgba(0,0,0,0.4)', border:'none', borderRadius:999, padding:8, cursor:'pointer', color:'white' }}>
-                <ArrowLeft size={22} />
-              </button>
-              <div style={{ position:'absolute', top:20, right:16, background:'rgba(147,51,234,0.9)', borderRadius:999, padding:'4px 12px', display:'flex', alignItems:'center', gap:4 }}>
-                <Gavel size={11} color="white" />
-                <span style={{ color:'white', fontSize:11, fontWeight:700 }}>АУКЦИОН</span>
-              </div>
-            </div>
-
-            <div style={{ padding:'0 24px' }}>
-              <h1 style={{ fontSize:20, fontWeight:900, marginBottom:20 }}>{a.title}</h1>
-
-              <div style={{ background:'linear-gradient(to right,rgba(168,85,247,0.2),rgba(59,130,246,0.2))', border:'1px solid rgba(168,85,247,0.3)', borderRadius:'1rem', padding:16, marginBottom:20 }}>
-                <p style={{ color:'#9ca3af', fontSize:12, textAlign:'center', marginBottom:8 }}>До окончания аукциона</p>
-                <div style={{ display:'flex', justifyContent:'center', gap:24 }}>
-                  {[{ v:h, l:'ч' }, { v:m, l:'м' }, { v:s, l:'с' }].map(({ v, l }) => (
-                    <div key={l} style={{ textAlign:'center' }}>
-                      <div style={{ fontSize:32, fontWeight:900, fontFamily:'monospace' }}>{String(v).padStart(2,'0')}</div>
-                      <div style={{ color:'#6b7280', fontSize:12 }}>{l}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginBottom:20 }}>
-                {[
-                  { label:'Текущая ставка', value:`${fmt(a.currentBid)} ₽`, color:'white' },
-                  { label:'Всего ставок',   value:a.bids,                   color:'#c084fc' },
-                ].map(item => (
-                  <div key={item.label} style={{ background:'rgba(255,255,255,0.05)', borderRadius:'1rem', padding:16 }}>
-                    <p style={{ color:'#9ca3af', fontSize:12 }}>{item.label}</p>
-                    <p style={{ color:item.color, fontWeight:900, fontSize:20, marginTop:4 }}>{item.value}</p>
-                  </div>
-                ))}
-              </div>
-
-              <p style={{ color:'#9ca3af', fontSize:14, lineHeight:1.7, marginBottom:24 }}>{a.description}</p>
-
-              <div style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'1rem', padding:16 }}>
-                <p style={{ fontWeight:700, fontSize:14, marginBottom:6 }}>Сделать ставку</p>
-                <p style={{ color:'#6b7280', fontSize:12, marginBottom:10 }}>Минимум: {fmt(a.currentBid + a.minStep)} ₽ (шаг {fmt(a.minStep)} ₽)</p>
-                <div style={{ display:'flex', gap:8 }}>
-                  <input
-                    type="number"
-                    placeholder={`${fmt(a.currentBid + a.minStep)} ₽`}
-                    value={bidInput[a.id] || ''}
-                    onChange={e => setBidInput(prev => ({ ...prev, [a.id]: e.target.value }))}
-                    style={{ flex:1, background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'0.75rem', padding:'12px 16px', color:'white', fontSize:14, outline:'none' }}
-                  />
-                  <button onClick={() => placeBid(a.id)}
-                    style={{ background:'#9333ea', color:'white', border:'none', borderRadius:'0.75rem', padding:'12px 16px', cursor:'pointer', display:'flex', alignItems:'center' }}>
-                    <Gavel size={18} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      };
-
-      // ── CART VIEW ─────────────────────────────────────────────────────────────
-      const CartView = () => (
-        <div style={{ background:'#0d1120', minHeight:'100vh', color:'white', paddingBottom:112 }}>
-          <div style={{ padding:'24px 20px 16px', display:'flex', alignItems:'center', gap:12 }}>
-            <ShoppingCart size={22} color="#fb923c" />
-            <h2 style={{ fontSize:20, fontWeight:900 }}>Корзина</h2>
-            {cartCount > 0 && <span style={{ marginLeft:'auto', color:'#9ca3af', fontSize:14 }}>{cartCount} поз.</span>}
-          </div>
-
-          {cart.length === 0 ? (
-            <div style={{ textAlign:'center', padding:'80px 32px' }}>
-              <div style={{ width:80, height:80, borderRadius:'50%', background:'rgba(255,255,255,0.05)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 20px' }}>
-                <ShoppingCart size={32} color="#4b5563" />
-              </div>
-              <p style={{ color:'#9ca3af', marginBottom:24 }}>Корзина пуста</p>
-              <button onClick={() => navTo('home')} style={{ color:'#fb923c', fontSize:14, fontWeight:700, background:'none', border:'none', cursor:'pointer' }}>← Вернуться к покупкам</button>
-            </div>
-          ) : (
-            <div style={{ padding:'0 16px' }}>
-              <div style={{ display:'flex', flexDirection:'column', gap:12, marginBottom:24 }}>
-                {cart.map(item => (
-                  <div key={item.id} style={{ background:'#1a2035', borderRadius:'1rem', padding:12, display:'flex', gap:12, alignItems:'center', border:'1px solid rgba(255,255,255,0.05)' }}>
-                    <img src={item.image} alt={item.title} style={{ width:72, height:72, borderRadius:'0.75rem', objectFit:'cover', flexShrink:0 }} />
-                    <div style={{ flex:1, minWidth:0 }}>
-                      <p style={{ fontWeight:600, fontSize:13, lineHeight:1.4, marginBottom:4, overflow:'hidden', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>{item.title}</p>
-                      <p style={{ color:'#fb923c', fontWeight:900, fontSize:14 }}>
-                        {fmt(item.salePrice || item.price)} ₽
-                        {item.onSale && <span style={{ color:'#6b7280', fontSize:12, textDecoration:'line-through', marginLeft:6 }}>{fmt(item.price)}</span>}
-                      </p>
-                      <div style={{ display:'flex', alignItems:'center', gap:8, marginTop:8 }}>
-                        <button onClick={() => updateQty(item.id, -1)} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(255,255,255,0.1)', border:'none', cursor:'pointer', color:'white', fontSize:16, display:'flex', alignItems:'center', justifyContent:'center' }}>−</button>
-                        <span style={{ fontSize:14, fontWeight:700, width:20, textAlign:'center' }}>{item.qty}</span>
-                        <button onClick={() => updateQty(item.id, 1)} style={{ width:28, height:28, borderRadius:'50%', background:'rgba(255,255,255,0.1)', border:'none', cursor:'pointer', color:'white', fontSize:16, display:'flex', alignItems:'center', justifyContent:'center' }}>+</button>
-                      </div>
-                    </div>
-                    <button onClick={() => removeFromCart(item.id)} style={{ padding:8, color:'#f87171', background:'rgba(248,113,113,0.1)', border:'none', borderRadius:'0.75rem', cursor:'pointer' }}>
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              <div style={{ background:'#1a2035', borderRadius:'1rem', padding:16, marginBottom:16, border:'1px solid rgba(255,255,255,0.05)' }}>
-                <div style={{ display:'flex', justifyContent:'space-between', color:'#9ca3af', fontSize:14, marginBottom:8 }}>
-                  <span>Товаров</span><span>{cartCount} шт.</span>
-                </div>
-                {cart.some(i => i.onSale) && (
-                  <div style={{ display:'flex', justifyContent:'space-between', color:'#4ade80', fontSize:14, marginBottom:8 }}>
-                    <span>Экономия</span>
-                    <span>-{fmt(cart.filter(i => i.onSale).reduce((s, i) => s + (i.price - i.salePrice) * i.qty, 0))} ₽</span>
-                  </div>
-                )}
-                <div style={{ display:'flex', justifyContent:'space-between', fontWeight:900, fontSize:20, borderTop:'1px solid rgba(255,255,255,0.1)', paddingTop:12, marginTop:8 }}>
-                  <span>Итого</span>
-                  <span style={{ color:'#fb923c' }}>{fmt(cartTotal)} ₽</span>
-                </div>
-              </div>
-
-              <button style={{ width:'100%', background:'#f97316', color:'white', border:'none', borderRadius:'1rem', padding:16, fontSize:16, fontWeight:900, cursor:'pointer' }}>
-                Оформить заказ
-              </button>
+        <div style={{position:'absolute',bottom:14,left:14,right:14,zIndex:3}}>
+          <div style={{color:'white',fontWeight:600,lineHeight:1.3,fontSize:isFeat?18:13}}>{p.title}</div>
+          {(isFeat||p.onSale) && (
+            <div style={{display:'flex',gap:6,alignItems:'baseline',marginTop:4}}>
+              {p.onSale
+                ? <><span style={{color:'#86efac',fontWeight:700,fontSize:isFeat?15:12}}>{fmt(p.salePrice)} ₽</span><span style={{color:'rgba(255,255,255,.4)',fontSize:11,textDecoration:'line-through'}}>{fmt(p.price)}</span></>
+                : <span style={{color:'rgba(255,255,255,.85)',fontWeight:600,fontSize:14}}>{fmt(p.price)} ₽</span>
+              }
             </div>
           )}
         </div>
-      );
+      </div>
+    );
+  }
 
-      // ── ABOUT VIEW ────────────────────────────────────────────────────────────
-      const AboutView = () => (
-        <div style={{ background:'#0d1120', minHeight:'100vh', color:'white', paddingBottom:112 }}>
-          <div style={{ padding:'24px 20px 24px', display:'flex', alignItems:'center', gap:12 }}>
-            <Info size={22} color="#fb923c" />
-            <h2 style={{ fontSize:20, fontWeight:900 }}>О магазине</h2>
+  /* ---- AUCTION CARD ---- */
+  function ACard({ a }) {
+    const { h, m } = useCD(a.endsAt);
+    const urg = h===0&&m<10;
+    return (
+      <div className="fi" style={{...dk,overflow:'hidden',border:`1px solid ${urg?'rgba(248,113,113,.4)':'rgba(168,85,247,.3)'}`}}>
+        <div style={{position:'relative',height:185,cursor:'pointer'}} onClick={()=>openA(a)}>
+          <img src={a.image} alt={a.title} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
+          <div style={{position:'absolute',inset:0,background:'linear-gradient(to top,rgba(0,0,0,.8),transparent)'}}/>
+          <div style={{position:'absolute',top:10,left:10,background:'rgba(147,51,234,.9)',borderRadius:999,padding:'3px 10px',display:'flex',alignItems:'center',gap:5}}>
+            <Ic.Gavel/><span style={{color:'white',fontSize:11,fontWeight:700}}>АУКЦИОН</span>
           </div>
-          <div style={{ padding:'0 16px', display:'flex', flexDirection:'column', gap:12 }}>
-            <div style={{ background:'#1a2035', borderRadius:'1rem', padding:24, border:'1px solid rgba(255,255,255,0.05)' }}>
-              <div style={{ display:'flex', justifyContent:'center', marginBottom:20 }}>
-                <div style={{ display:'flex', alignItems:'flex-end', lineHeight:1, fontWeight:900, fontSize:56, letterSpacing:'-3px' }}>
-                  <span style={{ color:'#fce7f3' }}>C</span>
-                  <span style={{ color:'#f48a59' }}>H</span>
-                </div>
-              </div>
-              <p style={{ color:'#d1d5db', fontSize:14, lineHeight:1.7, marginBottom:12 }}>
-                <strong style={{ color:'white' }}>Collection Hub</strong> — премиальный маркетплейс лимитированных и коллекционных товаров.
-              </p>
-              <p style={{ color:'#9ca3af', fontSize:14, lineHeight:1.7 }}>
-                Мы объединяем продавцов эксклюзивных кроссовок, винтажной одежды, дизайнерских игрушек и электроники с истинными ценителями редких вещей.
-              </p>
-            </div>
-            {[
-              { icon: <Award size={16} />,        text:'Гарантия оригинальности',        color:'#fb923c' },
-              { icon: <CheckCircle2 size={16} />, text:'Безопасная сделка',               color:'#4ade80' },
-              { icon: <Zap size={16} />,          text:'Быстрая доставка по всему миру',  color:'#93c5fd' },
-              { icon: <Gavel size={16} />,        text:'Прозрачные аукционы',             color:'#c084fc' },
-              { icon: <Tag size={16} />,          text:'Еженедельные распродажи',         color:'#f9a8d4' },
-            ].map((item, i) => (
-              <div key={i} style={{ background:'#1a2035', borderRadius:'0.75rem', padding:'12px 16px', display:'flex', alignItems:'center', gap:12, border:'1px solid rgba(255,255,255,0.05)' }}>
-                <span style={{ color:item.color }}>{item.icon}</span>
-                <span style={{ color:'#d1d5db', fontSize:14 }}>{item.text}</span>
-              </div>
-            ))}
+          <div style={{position:'absolute',top:10,right:10,background:'rgba(0,0,0,.6)',borderRadius:999,padding:'3px 10px'}}>
+            <CDot ts={a.endsAt} compact/>
           </div>
+          <div style={{position:'absolute',bottom:10,left:12,right:12,color:'white',fontWeight:700,fontSize:14,lineHeight:1.3}}>{a.title}</div>
         </div>
-      );
-
-      // ── ADMIN VIEW ────────────────────────────────────────────────────────────
-      const AdminView = () => {
-        const [newTitle,        setNewTitle]        = useState('');
-        const [newPrice,        setNewPrice]        = useState('');
-        const [newSalePrice,    setNewSalePrice]    = useState('');
-        const [newCategory,     setNewCategory]     = useState('clothes');
-        const [newIsAuction,    setNewIsAuction]    = useState(false);
-        const [newAuctionHours, setNewAuctionHours] = useState(24);
-        const [tab,             setTab]             = useState('products');
-
-        const handleAdd = (e) => {
-          e.preventDefault();
-          if (!newTitle || !newPrice) return;
-          if (newIsAuction) {
-            setAuctions(prev => [{
-              id: Date.now(), title: newTitle,
-              image: 'https://images.unsplash.com/photo-1578681994506-b8f463449011?w=600&q=80',
-              startPrice: parseInt(newPrice), currentBid: parseInt(newPrice),
-              minStep: Math.round(parseInt(newPrice) * 0.05),
-              endsAt: Date.now() + 1000 * 3600 * parseInt(newAuctionHours),
-              bids: 0, category: newCategory, description: 'Аукционный лот из админки.',
-            }, ...prev]);
-            showToast('Аукцион создан 🔨');
-          } else {
-            setProducts(prev => [{
-              id: Date.now(), title: newTitle,
-              price: parseInt(newPrice),
-              salePrice: newSalePrice ? parseInt(newSalePrice) : undefined,
-              onSale: !!newSalePrice,
-              image: 'https://images.unsplash.com/photo-1578681994506-b8f463449011?w=600&q=80',
-              type: 'small', category: newCategory,
-              description: 'Новый товар из админки.', sales: 0, isNew: true,
-            }, ...prev]);
-            showToast('Товар добавлен ✓');
-          }
-          setNewTitle(''); setNewPrice(''); setNewSalePrice('');
-        };
-
-        const inputStyle = { width:'100%', background:'#f9fafb', border:'1px solid #e5e7eb', borderRadius:'0.75rem', padding:'12px 16px', fontSize:14, outline:'none', fontFamily:'inherit' };
-
-        return (
-          <div style={{ background:'#f9fafb', minHeight:'100vh', color:'#111827', paddingBottom:112 }}>
-            <div style={{ display:'flex', alignItems:'center', gap:12, padding:'20px', background:'white', borderBottom:'1px solid #f3f4f6', boxShadow:'0 1px 3px rgba(0,0,0,0.05)' }}>
-              <button onClick={() => navTo('home')} style={{ background:'#f3f4f6', border:'none', borderRadius:'50%', padding:8, cursor:'pointer' }}>
-                <ArrowLeft size={18} />
-              </button>
-              <LayoutDashboard size={20} color="#f97316" />
-              <h2 style={{ fontSize:18, fontWeight:900 }}>Админ-панель</h2>
-            </div>
-
-            <div style={{ display:'flex', background:'white', borderBottom:'1px solid #f3f4f6' }}>
-              {[{ id:'products', l:'Товары' }, { id:'auctions', l:'Аукционы' }].map(t => (
-                <button key={t.id} onClick={() => setTab(t.id)}
-                  style={{ flex:1, padding:'12px', fontSize:14, fontWeight:700, background:'none', border:'none', cursor:'pointer', borderBottom: tab===t.id?'2px solid #f97316':'2px solid transparent', color: tab===t.id?'#f97316':'#9ca3af' }}>
-                  {t.l}
-                </button>
-              ))}
-            </div>
-
-            <div style={{ padding:16 }}>
-              <div style={{ background:'white', borderRadius:'1rem', padding:20, boxShadow:'0 1px 3px rgba(0,0,0,0.05)', marginBottom:20, border:'1px solid #f3f4f6' }}>
-                <h3 style={{ fontWeight:900, fontSize:15, marginBottom:16 }}>
-                  {newIsAuction ? '+ Создать аукцион' : '+ Добавить товар'}
-                </h3>
-                <form onSubmit={handleAdd} style={{ display:'flex', flexDirection:'column', gap:12 }}>
-                  <input type="text" placeholder="Название" style={inputStyle} value={newTitle} onChange={e => setNewTitle(e.target.value)} />
-                  <select value={newCategory} onChange={e => setNewCategory(e.target.value)} style={inputStyle}>
-                    {CATEGORIES.filter(c => c.id !== 'all').map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
-                  </select>
-                  <input type="number" placeholder={newIsAuction ? 'Стартовая цена (₽)' : 'Цена (₽)'} style={inputStyle} value={newPrice} onChange={e => setNewPrice(e.target.value)} />
-                  {!newIsAuction && <input type="number" placeholder="Цена со скидкой (опционально)" style={inputStyle} value={newSalePrice} onChange={e => setNewSalePrice(e.target.value)} />}
-                  {newIsAuction  && <input type="number" placeholder="Длительность (часов)" style={inputStyle} value={newAuctionHours} onChange={e => setNewAuctionHours(e.target.value)} />}
-
-                  <label style={{ display:'flex', alignItems:'center', gap:12, cursor:'pointer' }}>
-                    <div onClick={() => setNewIsAuction(prev => !prev)}
-                      style={{ width:44, height:24, borderRadius:999, background: newIsAuction?'#9333ea':'#d1d5db', position:'relative', transition:'background 0.2s', cursor:'pointer', flexShrink:0 }}>
-                      <div style={{ position:'absolute', top:2, left: newIsAuction?22:2, width:20, height:20, borderRadius:'50%', background:'white', boxShadow:'0 1px 3px rgba(0,0,0,0.2)', transition:'left 0.2s' }} />
-                    </div>
-                    <span style={{ fontSize:14, color:'#6b7280' }}>Создать как аукцион</span>
-                  </label>
-
-                  <button type="submit" style={{ background:'#111827', color:'white', border:'none', borderRadius:'0.75rem', padding:'12px', fontSize:14, fontWeight:700, cursor:'pointer' }}>
-                    {newIsAuction ? 'Создать аукцион' : 'Опубликовать'}
-                  </button>
-                </form>
-              </div>
-
-              {tab === 'products' ? (
-                <div>
-                  <h3 style={{ fontSize:12, fontWeight:900, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:12 }}>Каталог ({products.length})</h3>
-                  <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
-                    {products.map(p => (
-                      <div key={p.id} style={{ background:'white', borderRadius:'0.75rem', padding:12, display:'flex', gap:12, alignItems:'center', border:'1px solid #f3f4f6' }}>
-                        <img src={p.image} style={{ width:48, height:48, borderRadius:'0.5rem', objectFit:'cover', flexShrink:0 }} alt="" />
-                        <div style={{ flex:1, minWidth:0 }}>
-                          <p style={{ fontWeight:600, fontSize:13, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{p.title}</p>
-                          <div style={{ display:'flex', gap:8, alignItems:'center', marginTop:2 }}>
-                            {p.onSale
-                              ? <><span style={{ color:'#16a34a', fontSize:12, fontWeight:700 }}>{fmt(p.salePrice)} ₽</span><span style={{ color:'#9ca3af', fontSize:12, textDecoration:'line-through' }}>{fmt(p.price)}</span></>
-                              : <span style={{ color:'#6b7280', fontSize:12 }}>{fmt(p.price)} ₽</span>
-                            }
-                            <span style={{ fontSize:10, background:'#f3f4f6', color:'#9ca3af', padding:'1px 6px', borderRadius:999 }}>{p.category}</span>
-                          </div>
-                        </div>
-                        <button onClick={() => { setProducts(prev => prev.filter(x => x.id !== p.id)); showToast('Удалено'); }}
-                          style={{ padding:8, color:'#f87171', background:'#fef2f2', border:'none', borderRadius:'0.5rem', cursor:'pointer' }}>
-                          <Trash2 size={15} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  <h3 style={{ fontSize:12, fontWeight:900, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:12 }}>Аукционы ({auctions.length})</h3>
-                  <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
-                    {auctions.map(a => (
-                      <div key={a.id} style={{ background:'white', borderRadius:'0.75rem', padding:12, display:'flex', gap:12, alignItems:'center', border:'1px solid #f3f4f6' }}>
-                        <img src={a.image} style={{ width:48, height:48, borderRadius:'0.5rem', objectFit:'cover', flexShrink:0 }} alt="" />
-                        <div style={{ flex:1, minWidth:0 }}>
-                          <p style={{ fontWeight:600, fontSize:13, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{a.title}</p>
-                          <div style={{ display:'flex', gap:8, alignItems:'center', marginTop:2 }}>
-                            <span style={{ color:'#9333ea', fontSize:12, fontWeight:700 }}>{fmt(a.currentBid)} ₽</span>
-                            <CountdownBadge endsAt={a.endsAt} compact />
-                          </div>
-                        </div>
-                        <button onClick={() => { setAuctions(prev => prev.filter(x => x.id !== a.id)); showToast('Удалено'); }}
-                          style={{ padding:8, color:'#f87171', background:'#fef2f2', border:'none', borderRadius:'0.5rem', cursor:'pointer' }}>
-                          <Trash2 size={15} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+        <div style={{padding:14}}>
+          <div style={{display:'flex',justifyContent:'space-between',marginBottom:12}}>
+            <div><div style={{color:'#9ca3af',fontSize:12}}>Текущая ставка</div><div style={{fontWeight:900,fontSize:20}}>{fmt(a.currentBid)} ₽</div></div>
+            <div style={{textAlign:'right'}}><div style={{color:'#9ca3af',fontSize:12}}>Ставок</div><div style={{color:'#c084fc',fontWeight:700,fontSize:20}}>{a.bids}</div></div>
           </div>
-        );
-      };
-
-      // ── RENDER ────────────────────────────────────────────────────────────────
-      const isAdmin = currentView === 'admin';
-      return (
-        <div style={{ minHeight:'100vh', background:'#13172A', maxWidth:480, margin:'0 auto', position:'relative', fontFamily:'-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif' }}>
-
-          {currentView === 'home'           && <HomeView />}
-          {currentView === 'product'        && <ProductView />}
-          {currentView === 'auction-detail' && <AuctionDetailView />}
-          {currentView === 'cart'           && <CartView />}
-          {currentView === 'about'          && <AboutView />}
-          {currentView === 'admin'          && <AdminView />}
-
-          {/* Toast */}
-          {toast.msg && (
-            <div style={{
-              position:'fixed', top:32, left:'50%', transform:'translateX(-50%)',
-              background: toast.type === 'error' ? '#ef4444' : '#22c55e',
-              color:'white', padding:'10px 20px', borderRadius:999, fontSize:14, fontWeight:600,
-              boxShadow:'0 8px 24px rgba(0,0,0,0.4)', zIndex:9999,
-              animation:'slideDown 0.3s ease',
-              whiteSpace:'nowrap'
-            }}>
-              {toast.msg}
-            </div>
-          )}
-
-          {/* Bottom Navigation */}
-          {!isAdmin && (
-            <div style={{
-              position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
-              width:'100%', maxWidth:480,
-              background:'rgba(8,12,24,0.95)', backdropFilter:'blur(16px)',
-              borderTop:'1px solid rgba(255,255,255,0.05)', zIndex:40
-            }}>
-              <div style={{ display:'flex', justifyContent:'space-around', alignItems:'center', height:64, padding:'0 16px' }}>
-                {[
-                  { id:'home',  icon:<Home size={22}/>,         label:'Главная', match:['home','product','auction-detail'] },
-                  { id:'cart',  icon:<ShoppingCart size={22}/>, label:'Корзина', match:['cart'], badge:cartCount },
-                  { id:'about', icon:<Info size={22}/>,         label:'О нас',   match:['about'] },
-                ].map(nav => {
-                  const active = nav.match.includes(currentView);
-                  return (
-                    <button key={nav.id} onClick={() => navTo(nav.id)}
-                      style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:2, padding:8, position:'relative', background:'none', border:'none', cursor:'pointer', color: active ? '#fb923c' : '#4b5563', transition:'color 0.15s' }}>
-                      {nav.icon}
-                      {nav.badge > 0 && (
-                        <span style={{ position:'absolute', top:4, right:4, background:'#ef4444', color:'white', fontSize:9, width:16, height:16, borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:900 }}>
-                          {nav.badge > 9 ? '9+' : nav.badge}
-                        </span>
-                      )}
-                      <span style={{ fontSize:10, fontWeight:500 }}>{nav.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    // Mount
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
-  </script>
-</body>
-</html>
+          <div style={{display:'flex',gap:8}}>
+            <input type="number" placeholder={`от ${fmt(a.currentBid+a.minStep)} ₽`}
+              value={bids[a.id]||''} onChange={e=>setBids(p=>({...p,[a.id]:e.target.value}))} style={{...inp0,flex:1}}/>
+            <button onClick={()=>doBid(a.id)} style={{background:'#9333ea',color:'white',borderRadius:12,padding:'0 16px',fontWeight:700,fontSize:14}}>Ставка</button>
+          </div>
+          <div style={{color:'#4b5563',fontSize:10,m
